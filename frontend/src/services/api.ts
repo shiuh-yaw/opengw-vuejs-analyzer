@@ -62,34 +62,33 @@ apiClient.interceptors.response.use(
   }
 )
 
-// API service interface
-export interface TransactionData {
-  id: string
+// Enhanced API service interfaces
+export interface TransactionFlowStep {
   timestamp: string
-  amount: number
-  currency: string
-  status: 'success' | 'failed' | 'pending' | 'cancelled'
-  gateway: string
-  merchant_id: string
-  transaction_type: string
-  [key: string]: any
+  raw_content: string
+  has_json: boolean
+  json_content?: string
+  has_xml: boolean
+  xml_content?: string
+}
+
+export interface TransactionFlow {
+  transaction_id: string
+  flow: TransactionFlowStep[]
+}
+
+export interface ManusAnalysisResult {
+  summary: string
+  key_findings: string[]
+  recommendations: string[]
+  risk_score: number
+  confidence_score: number
 }
 
 export interface AnalysisResult {
   transaction_id: string
-  analysis: {
-    status: string
-    issues: string[]
-    recommendations: string[]
-    risk_score: number
-    patterns: string[]
-  }
-  manus_insights?: {
-    summary: string
-    key_findings: string[]
-    recommendations: string[]
-    confidence_score: number
-  }
+  analysis_provider: string
+  analysis: ManusAnalysisResult
 }
 
 export interface UploadResponse {
@@ -97,11 +96,12 @@ export interface UploadResponse {
   message: string
   file_id?: string
   transactions_count?: number
+  transaction_ids?: string[]
 }
 
-// API methods
+// Enhanced API methods
 export const api = {
-  // Upload transaction file
+  // Upload log file
   uploadFile: async (file: File): Promise<UploadResponse> => {
     const formData = new FormData()
     formData.append('file', file)
@@ -115,30 +115,21 @@ export const api = {
     return response.data
   },
 
-  // Get transactions list
-  getTransactions: async (fileId?: string): Promise<TransactionData[]> => {
-    const params = fileId ? { file_id: fileId } : {}
-    const response = await apiClient.get('/transactions', { params })
+  // Get transactions list from a specific file
+  getTransactions: async (fileId: string): Promise<string[]> => {
+    const response = await apiClient.get(`/transactions/${fileId}`)
     return response.data
   },
 
-  // Analyze single transaction
-  analyzeTransaction: async (transactionId: string): Promise<AnalysisResult> => {
-    const response = await apiClient.post(`/analyze/${transactionId}`)
+  // Get transaction flow with parsed steps
+  getTransactionFlow: async (fileId: string, transactionId: string): Promise<TransactionFlow> => {
+    const response = await apiClient.get(`/transactions/${fileId}/${transactionId}/flow`)
     return response.data
   },
 
   // Analyze transaction with Manus AI
-  analyzeWithManus: async (transactionId: string): Promise<AnalysisResult> => {
-    const response = await apiClient.post(`/analyze/manus/${transactionId}`)
-    return response.data
-  },
-
-  // Batch analyze transactions
-  batchAnalyze: async (transactionIds: string[]): Promise<AnalysisResult[]> => {
-    const response = await apiClient.post('/analyze/batch', {
-      transaction_ids: transactionIds
-    })
+  analyzeWithManus: async (transactionId: string, fileId: string): Promise<AnalysisResult> => {
+    const response = await apiClient.post(`/analyze/manus/${transactionId}?file_id=${fileId}`)
     return response.data
   },
 
@@ -152,7 +143,13 @@ export const api = {
   healthCheck: async (): Promise<{ status: string; timestamp: string; version: string }> => {
     const response = await apiClient.get('/health')
     return response.data
-  }
+  },
+
+  // Direct axios methods for flexibility
+  get: apiClient.get,
+  post: apiClient.post,
+  put: apiClient.put,
+  delete: apiClient.delete
 }
 
 export default apiClient

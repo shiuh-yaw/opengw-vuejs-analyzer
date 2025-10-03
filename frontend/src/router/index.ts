@@ -43,6 +43,14 @@ const router = createRouter({
       meta: {
         title: 'Transaction Detail - OpenGW Agentic Analyzer'
       }
+    },
+    {
+      path: '/transaction/:id/flow',
+      name: 'transaction-flow',
+      component: () => import('@/views/TransactionFlowView.vue'),
+      meta: {
+        title: 'Transaction Flow - OpenGW Agentic Analyzer'
+      }
     }
   ]
 })

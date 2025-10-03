@@ -1,46 +1,38 @@
-# OpenGW Agentic Transaction Analyzer (Vue.js Edition)
+# OpenGW Agentic Transaction Analyzer (Vue.js Edition) - Enhanced
 
-This project is an advanced transaction analysis tool featuring a Vue.js frontend and a Python backend. It is specifically engineered with comprehensive cache prevention strategies to ensure that users always interact with the most up-to-date data and application version.
+This project is an advanced transaction analysis tool featuring a Vue.js frontend and a Python backend. It has been enhanced with Manus AI integration, detailed transaction flow visualization, and a sophisticated JSON/XML content viewer.
 
 ## Key Features
 
 - **Modern Frontend**: A responsive and interactive user interface built with Vue.js 3, Vite, and Tailwind CSS.
 - **Powerful Backend**: A robust API built with Python and FastAPI for efficient data processing and analysis.
+- **Manus AI Integration**: Seamless integration with Manus AI for intelligent transaction analysis, providing risk scores, key findings, and recommendations.
+- **Transaction Flow Visualization**: A step-by-step visualization of the entire transaction flow, parsed directly from OpenGW logs.
+- **Beautified Content Viewer**: A sophisticated component for displaying and toggling between beautified JSON and XML content found in logs.
 - **Comprehensive Cache Prevention**: A multi-layered strategy to eliminate both frontend and backend caching issues.
-- **AI-Powered Analysis**: (Simulated) Integration with Manus AI for intelligent transaction insights.
 - **Easy Development Setup**: A single script to launch the entire development environment.
 - **Production-Ready Build**: A script to generate a production-optimized build with cache-busting.
 
-## Cache Prevention Strategies
+## Enhanced Functionality
 
-This project implements a robust set of strategies to prevent caching at every level of the application stack.
+### Manus AI Integration
 
-### Frontend (Vue.js + Vite)
+The application now directly integrates with a (mock) Manus AI client to provide in-depth analysis of transactions. This includes:
+- **Risk Scoring**: A numerical score representing the potential risk of a transaction.
+- **Key Findings**: A list of identified issues or patterns.
+- **Recommendations**: Actionable recommendations for handling the transaction.
 
-1.  **Vite Build Configuration (`vite.config.ts`)**:
-    *   **Content-Based Hashing**: All generated assets (JS, CSS) have unique filenames based on their content hash (`[name]-[hash].js`). This ensures that browsers only download new assets when they have actually changed.
-    *   **Disabled Dev Server Cache**: The Vite development server is configured to send `Cache-Control: no-cache` headers to prevent caching during development.
+### Transaction Flow Visualization
 
-2.  **HTML Meta Tags (`index.html`)**:
-    *   Explicit `Cache-Control`, `Pragma`, and `Expires` meta tags are included to instruct browsers not to cache the main HTML file.
+The new Transaction Flow view provides a detailed, step-by-step breakdown of each transaction's lifecycle. The backend parses `INFO OPENGW_MESSAGE_LOG -` entries from the log file, and the frontend displays them in a clear, chronological order.
 
-3.  **API Client (axios)**:
-    *   All API requests sent from the frontend automatically include cache-busting parameters (`_cb=timestamp`) and headers (`Cache-Control: no-cache`).
+### JSON/XML Content Viewer
 
-4.  **Vue Router**:
-    *   A navigation guard adds a unique cache-busting meta tag to the document head on every route change, further preventing stale views.
-
-### Backend (Python + FastAPI)
-
-1.  **Cache-Control Middleware**:
-    *   A FastAPI middleware is implemented to automatically add the following headers to **every** API response:
-        *   `Cache-Control: no-cache, no-store, must-revalidate, private`
-        *   `Pragma: no-cache`
-        *   `Expires: 0`
-    *   A unique `ETag` is generated for every response to prevent conditional caching.
-
-2.  **Disabled Python Caching**:
-    *   The development server runs with `PYTHONDONTWRITEBYTECODE=1` to prevent the creation of `.pyc` cache files.
+A new `ContentViewer` component has been developed to handle the display of structured data within log entries:
+- **Automatic Detection**: The backend automatically detects and extracts JSON and XML content from log messages.
+- **Beautified Display**: Both JSON and XML are beautified for readability.
+- **Toggle Functionality**: If a log entry contains both JSON and XML, the user can easily toggle between the two views.
+- **Copy to Clipboard**: Users can copy the beautified content with a single click.
 
 ## Getting Started
 
