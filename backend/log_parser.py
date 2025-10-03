@@ -3,6 +3,9 @@ import xml.dom.minidom
 from typing import List, Dict, Any, Tuple, Optional
 import re
 
+# Internal modules
+from psp_database import identify_psp
+
 def beautify_json(content: str) -> str:
     """Pretty-prints a JSON string."""
     try:
@@ -24,15 +27,15 @@ def parse_content_block(block_str: str) -> Tuple[Optional[str], Optional[str]]:
     json_content = None
     xml_content = None
 
-    if (block_str.startswith('{') and block_str.endswith('}')) or \
-       (block_str.startswith('[') and block_str.endswith(']')):
+    if (block_str.startswith("{") and block_str.endswith("}")) or \
+       (block_str.startswith("[") and block_str.endswith("]")):
         try:
             json.loads(block_str)
             json_content = block_str
         except json.JSONDecodeError:
             pass
 
-    if block_str.startswith('<') and block_str.endswith('>'):
+    if block_str.startswith("<") and block_str.endswith(">"):
         try:
             xml.dom.minidom.parseString(block_str)
             xml_content = block_str
@@ -43,11 +46,9 @@ def parse_content_block(block_str: str) -> Tuple[Optional[str], Optional[str]]:
 
 def parse_input_into_blocks(raw_content: str) -> List[Dict[str, Any]]:
     """
-    Parses raw text content into blocks separated by '[' and ']'.
-    Each block is analyzed for JSON or XML content and pretty-printed.
+    Parses raw text content into blocks, identifies PSPs, and pretty-prints JSON/XML.
     """
-    # This regex finds all content enclosed within square brackets.
-    blocks_content = re.findall(r'\[(.*?)\]', raw_content, re.DOTALL)
+    blocks_content = re.findall(r"\[(.*?)\]", raw_content, re.DOTALL)
     
     parsed_blocks = []
     for i, block_str in enumerate(blocks_content):
@@ -62,11 +63,15 @@ def parse_input_into_blocks(raw_content: str) -> List[Dict[str, Any]]:
             content_type = "xml"
             beautified_content = beautify_xml(xml_content)
 
+        # Identify PSP
+        psp = identify_psp(block_str)
+
         block_data = {
             "id": i + 1,
             "raw_content": block_str.strip(),
             "type": content_type,
             "beautified_content": beautified_content,
+            "psp": psp,
         }
         parsed_blocks.append(block_data)
         

@@ -3,6 +3,9 @@ import random
 from typing import Dict, Any, List
 import openai
 
+# Internal modules
+from psp_database import get_psp_api_docs
+
 class AI_Agent:
     """A mock AI agent that simulates a call to an AI model for text analysis."""
 
@@ -14,6 +17,7 @@ class AI_Agent:
     def analyze(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Simulates a call to an AI model for analysis."""
         content_to_analyze = data.get("content", "")
+        psp = data.get("psp")
         
         time.sleep(random.uniform(0.5, 1.5))
 
@@ -23,8 +27,10 @@ class AI_Agent:
             return self._analyze_compliance(content_to_analyze)
         elif self.focus == "Fraud":
             return self._analyze_fraud(content_to_analyze)
+        elif self.focus == "Optimization" and psp:
+            return self._analyze_optimization(content_to_analyze, psp)
         else:
-            return {"error": "Unknown focus"}
+            return {"error": "Unknown focus or missing PSP for Optimization"}
 
     def _analyze_risk(self, content: str) -> Dict[str, Any]:
         risk_score = random.uniform(0.1, 0.9)
@@ -68,6 +74,29 @@ class AI_Agent:
             "indicators": fraud_indicators,
         }
 
+    def _analyze_optimization(self, content: str, psp: str) -> Dict[str, Any]:
+        api_docs = get_psp_api_docs(psp)
+        if not api_docs:
+            return {"error": f"No API documentation found for {psp}"}
+
+        optimizations = []
+        for endpoint, details in api_docs.get("endpoints", {}).items():
+            if endpoint in content:
+                if details.get("status") == "legacy":
+                    optimizations.append(f"Legacy endpoint '{endpoint}' detected. {details.get('recommendation')}")
+                else:
+                    optimizations.append(f"Endpoint '{endpoint}' detected. {details.get('recommendation')}")
+        
+        # Add general optimizations
+        optimizations.extend(api_docs.get("optimizations", []))
+
+        return {
+            "model": self.model_name,
+            "focus": self.focus,
+            "psp": psp,
+            "optimizations": optimizations,
+        }
+
 class MultiAgentSystem:
     """Orchestrates analysis from multiple AI agents."""
 
@@ -76,13 +105,17 @@ class MultiAgentSystem:
             AI_Agent(model_name="gpt-4.1-mini", focus="Risk"),
             AI_Agent(model_name="gemini-2.5-flash", focus="Compliance"),
             AI_Agent(model_name="gpt-4.1-nano", focus="Fraud"),
+            AI_Agent(model_name="gemini-2.5-flash", focus="Optimization"),
         ]
 
-    def analyze_content(self, content: str) -> List[Dict[str, Any]]:
+    def analyze_content(self, content: str, psp: str = None) -> List[Dict[str, Any]]:
         """Runs a block of content through all agents and aggregates the results."""
-        analysis_input = {"content": content}
+        analysis_input = {"content": content, "psp": psp}
         results = []
         for agent in self.agents:
+            # Only run optimization agent if a PSP is identified
+            if agent.focus == "Optimization" and not psp:
+                continue
             results.append(agent.analyze(analysis_input))
         return results
 

@@ -121,6 +121,12 @@
                   >
                     {{ block.type.toUpperCase() }}
                   </span>
+                  <span 
+                    v-if="block.psp"
+                    class="px-2 py-1 text-xs font-medium rounded bg-purple-100 text-purple-800"
+                  >
+                    {{ block.psp }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -215,7 +221,8 @@ const analyzeBlock = async (block: any) => {
     analyzingBlocks.value.add(block.id)
     
     const response = await api.post('/analyze/multi-agent', {
-      content: block.beautified_content || block.raw_content
+      content: block.beautified_content || block.raw_content,
+      psp: block.psp
     })
     
     blockAnalysis.value[block.id] = response.data.analysis

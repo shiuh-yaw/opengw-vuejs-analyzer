@@ -1,13 +1,14 @@
-# OpenGW Multi-Agent Analyzer
+# OpenGW Multi-Agent PSP Analyzer
 
-This project is an advanced log analysis tool featuring a Vue.js frontend and a Python backend. It has been significantly enhanced to include a multi-agent AI system for comprehensive content analysis and an intelligent log parser that structures raw text into analyzable blocks.
+This project is an advanced log analysis tool featuring a Vue.js frontend and a Python backend. It has been significantly enhanced to include a multi-agent AI system for comprehensive content analysis, intelligent log parsing, and Payment Service Provider (PSP) specific optimization analysis.
 
 ## Key Features
 
 - **Modern Frontend**: A responsive and interactive user interface built with Vue.js 3, Vite, and Tailwind CSS.
 - **Powerful Backend**: A robust API built with Python and FastAPI for efficient data processing and analysis.
-- **Multi-Agent AI System**: Leverages multiple AI models (simulated) to analyze content from different perspectives: Risk, Compliance, and Fraud.
+- **Multi-Agent AI System**: Leverages multiple AI models (simulated) to analyze content from different perspectives: Risk, Compliance, Fraud, and PSP Optimization.
 - **Intelligent Block Parsing**: Automatically parses raw log files into content blocks based on `[` and `]` delimiters.
+- **PSP Identification**: Automatically identifies the PSP (e.g., Stripe, PayPal, Adyen) from the content of each block.
 - **Beautified Content Viewer**: Identifies and pretty-prints JSON and XML within content blocks for enhanced readability.
 - **Comprehensive Cache Prevention**: A multi-layered strategy to eliminate both frontend and backend caching issues.
 - **Easy Development Setup**: A single script to launch the entire development environment.
@@ -15,25 +16,27 @@ This project is an advanced log analysis tool featuring a Vue.js frontend and a 
 
 ## Core Enhancements
 
-### Multi-Agent AI System
+### Multi-Agent AI System with PSP Optimization
 
 The application now features a sophisticated backend system that simulates a multi-agent analysis process. Each agent represents a different AI model with a specific focus:
 
 - **Risk Agent (`gpt-4.1-mini`)**: Analyzes content for potential risks and calculates a risk score.
 - **Compliance Agent (`gemini-2.5-flash`)**: Checks content for compliance issues and violations.
 - **Fraud Agent (`gpt-4.1-nano`)**: Scans content for indicators of fraudulent activity.
+- **PSP Optimization Agent (`gemini-2.5-flash`)**: Provides optimization suggestions based on the identified PSP's API documentation.
 
-The frontend presents these multi-faceted analyses in a clear, organized report for each content block, providing a holistic view of potential issues.
+The frontend presents these multi-faceted analyses in a clear, organized report for each content block, providing a holistic view of potential issues and optimization opportunities.
 
-### Intelligent Block Parsing
+### Intelligent Block Parsing with PSP Identification
 
 The new backend parser intelligently processes raw log files:
 
 1.  **Block Separation**: The content of an uploaded file is automatically broken down into distinct blocks, using `[` and `]` as delimiters.
-2.  **Content Identification**: Each block is analyzed to determine if it contains JSON, XML, or plain text.
-3.  **Pretty-Printing**: JSON and XML content is automatically beautified (pretty-printed) for significantly improved readability.
+2.  **PSP Identification**: Each block is analyzed to identify the PSP being used.
+3.  **Content Identification**: Each block is analyzed to determine if it contains JSON, XML, or plain text.
+4.  **Pretty-Printing**: JSON and XML content is automatically beautified (pretty-printed) for significantly improved readability.
 
-This allows users to work with structured, easy-to-read data, even from semi-structured or messy log files.
+This allows users to work with structured, easy-to-read data, even from semi-structured or messy log files, and to quickly see which PSP is being used in each step of a transaction.
 
 ## Getting Started
 

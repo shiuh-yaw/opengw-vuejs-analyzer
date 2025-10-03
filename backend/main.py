@@ -94,7 +94,7 @@ async def analyze_with_multi_agent_system(request_data: Dict[str, Any]):
         raise HTTPException(status_code=400, detail="Content is required for analysis.")
 
     try:
-        multi_agent_analysis = multi_agent_system.analyze_content(content)
+        multi_agent_analysis = multi_agent_system.analyze_content(content, request_data.get("psp"))
         return {
             "analysis_provider": "Multi-Agent System",
             "analysis": multi_agent_analysis

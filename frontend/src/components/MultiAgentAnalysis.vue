@@ -1,6 +1,6 @@
 <template>
   <div class="multi-agent-analysis">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Risk Analysis Agent -->
       <div v-if="riskAnalysis" class="agent-card risk-card">
         <div class="agent-header">
@@ -140,12 +140,52 @@
           </div>
         </div>
       </div>
+
+      <!-- PSP Optimization Analysis Agent -->
+      <div v-if="optimizationAnalysis" class="agent-card optimization-card">
+        <div class="agent-header">
+          <div class="flex items-center space-x-3">
+            <div class="agent-icon bg-purple-100 text-purple-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">PSP Optimization</h3>
+              <p class="text-sm text-gray-600">{{ optimizationAnalysis.model }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-content">
+          <div v-if="optimizationAnalysis.psp" class="psp-section">
+            <div class="flex items-center space-x-2 mb-3">
+              <span class="text-sm font-medium text-gray-700">PSP:</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                {{ optimizationAnalysis.psp }}
+              </span>
+            </div>
+          </div>
+          
+          <div v-if="optimizationAnalysis.optimizations?.length" class="optimizations-section">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Optimization Suggestions</h4>
+            <ul class="space-y-1">
+              <li v-for="optimization in optimizationAnalysis.optimizations" :key="optimization" class="text-sm text-gray-600 flex items-start space-x-2">
+                <svg class="w-3 h-3 mt-0.5 text-purple-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ optimization }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Summary Section -->
     <div v-if="hasAnyAnalysis" class="mt-6 p-4 bg-gray-50 rounded-lg">
       <h3 class="text-lg font-semibold text-gray-900 mb-3">Analysis Summary</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
         <div v-if="riskAnalysis" class="summary-item">
           <span class="font-medium text-gray-700">Overall Risk:</span>
           <span :class="getRiskScoreColor(riskAnalysis.risk_score)" class="ml-2 font-semibold">
@@ -166,6 +206,52 @@
           <span :class="getFraudProbabilityColor(fraudAnalysis.fraud_probability)" class="ml-2 font-semibold">
             {{ getFraudLevel(fraudAnalysis.fraud_probability) }}
           </span>
+        </div>
+        <div v-if="optimizationAnalysis" class="summary-item">
+          <span class="font-medium text-gray-700">PSP Optimizations:</span>
+          <span class="ml-2 font-semibold text-purple-600">
+            {{ optimizationAnalysis.optimizations?.length || 0 }} suggestions
+          </span>
+        </div>
+      </div>
+
+      <!-- PSP Optimization Analysis Agent -->
+      <div v-if="optimizationAnalysis" class="agent-card optimization-card">
+        <div class="agent-header">
+          <div class="flex items-center space-x-3">
+            <div class="agent-icon bg-purple-100 text-purple-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">PSP Optimization</h3>
+              <p class="text-sm text-gray-600">{{ optimizationAnalysis.model }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-content">
+          <div v-if="optimizationAnalysis.psp" class="psp-section">
+            <div class="flex items-center space-x-2 mb-3">
+              <span class="text-sm font-medium text-gray-700">PSP:</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                {{ optimizationAnalysis.psp }}
+              </span>
+            </div>
+          </div>
+          
+          <div v-if="optimizationAnalysis.optimizations?.length" class="optimizations-section">
+            <h4 class="text-sm font-medium text-gray-700 mb-2">Optimization Suggestions</h4>
+            <ul class="space-y-1">
+              <li v-for="optimization in optimizationAnalysis.optimizations" :key="optimization" class="text-sm text-gray-600 flex items-start space-x-2">
+                <svg class="w-3 h-3 mt-0.5 text-purple-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>{{ optimization }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -199,8 +285,12 @@ const fraudAnalysis = computed(() =>
   props.analysisResults?.find(result => result.focus === 'Fraud')
 )
 
+const optimizationAnalysis = computed(() => 
+  props.analysisResults?.find(result => result.focus === 'Optimization')
+)
+
 const hasAnyAnalysis = computed(() => 
-  riskAnalysis.value || complianceAnalysis.value || fraudAnalysis.value
+  riskAnalysis.value || complianceAnalysis.value || fraudAnalysis.value || optimizationAnalysis.value
 )
 
 // Methods for styling
