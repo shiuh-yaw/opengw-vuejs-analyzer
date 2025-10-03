@@ -63,40 +63,33 @@ apiClient.interceptors.response.use(
 )
 
 // Enhanced API service interfaces
-export interface TransactionFlowStep {
-  timestamp: string
+export interface ContentBlock {
+  id: number
   raw_content: string
-  has_json: boolean
-  json_content?: string
-  has_xml: boolean
-  xml_content?: string
+  type: 'json' | 'xml' | 'text'
+  beautified_content: string
 }
 
-export interface TransactionFlow {
-  transaction_id: string
-  flow: TransactionFlowStep[]
+export interface BlocksResponse {
+  file_id: string
+  blocks: ContentBlock[]
 }
 
-export interface ManusAnalysisResult {
-  summary: string
-  key_findings: string[]
-  recommendations: string[]
-  risk_score: number
-  confidence_score: number
+export interface MultiAgentAnalysisResult {
+  model: string
+  focus: string
+  [key: string]: any
 }
 
-export interface AnalysisResult {
-  transaction_id: string
+export interface MultiAgentResponse {
   analysis_provider: string
-  analysis: ManusAnalysisResult
+  analysis: MultiAgentAnalysisResult[]
 }
 
 export interface UploadResponse {
   success: boolean
   message: string
   file_id?: string
-  transactions_count?: number
-  transaction_ids?: string[]
 }
 
 // Enhanced API methods
@@ -115,27 +108,15 @@ export const api = {
     return response.data
   },
 
-  // Get transactions list from a specific file
-  getTransactions: async (fileId: string): Promise<string[]> => {
-    const response = await apiClient.get(`/transactions/${fileId}`)
+  // Get parsed blocks from a file
+  getFileBlocks: async (fileId: string): Promise<BlocksResponse> => {
+    const response = await apiClient.get(`/file/${fileId}/blocks`)
     return response.data
   },
 
-  // Get transaction flow with parsed steps
-  getTransactionFlow: async (fileId: string, transactionId: string): Promise<TransactionFlow> => {
-    const response = await apiClient.get(`/transactions/${fileId}/${transactionId}/flow`)
-    return response.data
-  },
-
-  // Analyze transaction with Manus AI
-  analyzeWithManus: async (transactionId: string, fileId: string): Promise<AnalysisResult> => {
-    const response = await apiClient.post(`/analyze/manus/${transactionId}?file_id=${fileId}`)
-    return response.data
-  },
-
-  // Get analysis history
-  getAnalysisHistory: async (): Promise<AnalysisResult[]> => {
-    const response = await apiClient.get('/analysis/history')
+  // Analyze content with multi-agent system
+  analyzeWithMultiAgent: async (content: string): Promise<MultiAgentResponse> => {
+    const response = await apiClient.post('/analyze/multi-agent', { content })
     return response.data
   },
 

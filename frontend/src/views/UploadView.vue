@@ -74,25 +74,21 @@
             {{ uploadStatus.message }}
           </p>
           
-          <div v-if="uploadStatus.success && uploadStatus.transactions_count" class="mt-3">
-            <p class="text-sm text-gray-700">
-              <strong>Transactions found:</strong> {{ uploadStatus.transactions_count }}
-            </p>
-            <p class="text-sm text-gray-700">
-              <strong>File ID:</strong> {{ uploadStatus.file_id }}
-            </p>
-          </div>
-          
-          <div v-if="uploadStatus.success" class="mt-4 space-x-3">
-            <RouterLink 
-              :to="`/transactions?file_id=${uploadStatus.file_id}`"
-              class="btn-primary"
-            >
-              View Transactions
-            </RouterLink>
-            <button @click="resetUpload" class="btn-secondary">
-              Upload Another File
-            </button>
+          <div v-if="uploadStatus.success" class="mt-4">
+            <div class="flex space-x-3">
+              <button
+                @click="resetUpload"
+                class="btn-secondary"
+              >
+                Upload Another File
+              </button>
+              <RouterLink
+                :to="`/blocks?file_id=${uploadStatus.file_id}`"
+                class="btn-primary"
+              >
+                Analyze Blocks
+              </RouterLink>
+            </div>
           </div>
         </div>
       </div>

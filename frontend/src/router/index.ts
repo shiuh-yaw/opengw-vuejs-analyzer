@@ -51,6 +51,14 @@ const router = createRouter({
       meta: {
         title: 'Transaction Flow - OpenGW Agentic Analyzer'
       }
+    },
+    {
+      path: '/blocks',
+      name: 'block-analysis',
+      component: () => import('@/views/BlockAnalysisView.vue'),
+      meta: {
+        title: 'Block Analysis - OpenGW Multi-Agent Analyzer'
+      }
     }
   ]
 })

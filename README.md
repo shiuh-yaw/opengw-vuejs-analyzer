@@ -1,38 +1,39 @@
-# OpenGW Agentic Transaction Analyzer (Vue.js Edition) - Enhanced
+# OpenGW Multi-Agent Analyzer
 
-This project is an advanced transaction analysis tool featuring a Vue.js frontend and a Python backend. It has been enhanced with Manus AI integration, detailed transaction flow visualization, and a sophisticated JSON/XML content viewer.
+This project is an advanced log analysis tool featuring a Vue.js frontend and a Python backend. It has been significantly enhanced to include a multi-agent AI system for comprehensive content analysis and an intelligent log parser that structures raw text into analyzable blocks.
 
 ## Key Features
 
 - **Modern Frontend**: A responsive and interactive user interface built with Vue.js 3, Vite, and Tailwind CSS.
 - **Powerful Backend**: A robust API built with Python and FastAPI for efficient data processing and analysis.
-- **Manus AI Integration**: Seamless integration with Manus AI for intelligent transaction analysis, providing risk scores, key findings, and recommendations.
-- **Transaction Flow Visualization**: A step-by-step visualization of the entire transaction flow, parsed directly from OpenGW logs.
-- **Beautified Content Viewer**: A sophisticated component for displaying and toggling between beautified JSON and XML content found in logs.
+- **Multi-Agent AI System**: Leverages multiple AI models (simulated) to analyze content from different perspectives: Risk, Compliance, and Fraud.
+- **Intelligent Block Parsing**: Automatically parses raw log files into content blocks based on `[` and `]` delimiters.
+- **Beautified Content Viewer**: Identifies and pretty-prints JSON and XML within content blocks for enhanced readability.
 - **Comprehensive Cache Prevention**: A multi-layered strategy to eliminate both frontend and backend caching issues.
 - **Easy Development Setup**: A single script to launch the entire development environment.
 - **Production-Ready Build**: A script to generate a production-optimized build with cache-busting.
 
-## Enhanced Functionality
+## Core Enhancements
 
-### Manus AI Integration
+### Multi-Agent AI System
 
-The application now directly integrates with a (mock) Manus AI client to provide in-depth analysis of transactions. This includes:
-- **Risk Scoring**: A numerical score representing the potential risk of a transaction.
-- **Key Findings**: A list of identified issues or patterns.
-- **Recommendations**: Actionable recommendations for handling the transaction.
+The application now features a sophisticated backend system that simulates a multi-agent analysis process. Each agent represents a different AI model with a specific focus:
 
-### Transaction Flow Visualization
+- **Risk Agent (`gpt-4.1-mini`)**: Analyzes content for potential risks and calculates a risk score.
+- **Compliance Agent (`gemini-2.5-flash`)**: Checks content for compliance issues and violations.
+- **Fraud Agent (`gpt-4.1-nano`)**: Scans content for indicators of fraudulent activity.
 
-The new Transaction Flow view provides a detailed, step-by-step breakdown of each transaction's lifecycle. The backend parses `INFO OPENGW_MESSAGE_LOG -` entries from the log file, and the frontend displays them in a clear, chronological order.
+The frontend presents these multi-faceted analyses in a clear, organized report for each content block, providing a holistic view of potential issues.
 
-### JSON/XML Content Viewer
+### Intelligent Block Parsing
 
-A new `ContentViewer` component has been developed to handle the display of structured data within log entries:
-- **Automatic Detection**: The backend automatically detects and extracts JSON and XML content from log messages.
-- **Beautified Display**: Both JSON and XML are beautified for readability.
-- **Toggle Functionality**: If a log entry contains both JSON and XML, the user can easily toggle between the two views.
-- **Copy to Clipboard**: Users can copy the beautified content with a single click.
+The new backend parser intelligently processes raw log files:
+
+1.  **Block Separation**: The content of an uploaded file is automatically broken down into distinct blocks, using `[` and `]` as delimiters.
+2.  **Content Identification**: Each block is analyzed to determine if it contains JSON, XML, or plain text.
+3.  **Pretty-Printing**: JSON and XML content is automatically beautified (pretty-printed) for significantly improved readability.
+
+This allows users to work with structured, easy-to-read data, even from semi-structured or messy log files.
 
 ## Getting Started
 

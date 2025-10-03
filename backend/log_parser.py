@@ -1,54 +1,74 @@
 import json
-import xml.etree.ElementTree as ET
+import xml.dom.minidom
 from typing import List, Dict, Any, Tuple, Optional
+import re
 
-def parse_log_content(content: str) -> Tuple[Optional[str], Optional[str]]:
-    """Identifies and extracts JSON or XML content from a log string."""
+def beautify_json(content: str) -> str:
+    """Pretty-prints a JSON string."""
+    try:
+        return json.dumps(json.loads(content), indent=2)
+    except (json.JSONDecodeError, TypeError):
+        return content
+
+def beautify_xml(content: str) -> str:
+    """Pretty-prints an XML string."""
+    try:
+        dom = xml.dom.minidom.parseString(content)
+        return dom.toprettyxml(indent="  ")
+    except Exception:
+        return content
+
+def parse_content_block(block_str: str) -> Tuple[Optional[str], Optional[str]]:
+    """Identifies if a block of text is JSON or XML."""
+    block_str = block_str.strip()
     json_content = None
     xml_content = None
 
-    try:
-        # Attempt to parse as JSON
-        start_index = content.find("{")
-        end_index = content.rfind("}")
-        if start_index != -1 and end_index != -1:
-            json_str = content[start_index : end_index + 1]
-            json.loads(json_str)
-            json_content = json_str
-    except json.JSONDecodeError:
-        pass
+    if (block_str.startswith('{') and block_str.endswith('}')) or \
+       (block_str.startswith('[') and block_str.endswith(']')):
+        try:
+            json.loads(block_str)
+            json_content = block_str
+        except json.JSONDecodeError:
+            pass
 
-    try:
-        # Attempt to parse as XML
-        start_index = content.find("<")
-        end_index = content.rfind(">")
-        if start_index != -1 and end_index != -1:
-            xml_str = content[start_index : end_index + 1]
-            ET.fromstring(xml_str)
-            xml_content = xml_str
-    except ET.ParseError:
-        pass
+    if block_str.startswith('<') and block_str.endswith('>'):
+        try:
+            xml.dom.minidom.parseString(block_str)
+            xml_content = block_str
+        except Exception:
+            pass
 
     return json_content, xml_content
 
-def parse_transaction_flow(log_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Parses a list of log entries to extract the transaction flow."""
-    flow_steps = []
-    for entry in log_data:
-        message = entry.get("message", "")
-        if "INFO  OPENGW_MESSAGE_LOG -" in message:
-            content_part = message.split("INFO  OPENGW_MESSAGE_LOG -", 1)[1].strip()
-            json_content, xml_content = parse_log_content(content_part)
+def parse_input_into_blocks(raw_content: str) -> List[Dict[str, Any]]:
+    """
+    Parses raw text content into blocks separated by '[' and ']'.
+    Each block is analyzed for JSON or XML content and pretty-printed.
+    """
+    # This regex finds all content enclosed within square brackets.
+    blocks_content = re.findall(r'\[(.*?)\]', raw_content, re.DOTALL)
+    
+    parsed_blocks = []
+    for i, block_str in enumerate(blocks_content):
+        json_content, xml_content = parse_content_block(block_str)
+        
+        content_type = "text"
+        beautified_content = block_str.strip()
+        if json_content:
+            content_type = "json"
+            beautified_content = beautify_json(json_content)
+        elif xml_content:
+            content_type = "xml"
+            beautified_content = beautify_xml(xml_content)
 
-            step = {
-                "timestamp": entry.get("timestamp"),
-                "raw_content": content_part,
-                "has_json": bool(json_content),
-                "json_content": json_content,
-                "has_xml": bool(xml_content),
-                "xml_content": xml_content,
-            }
-            flow_steps.append(step)
-
-    return flow_steps
+        block_data = {
+            "id": i + 1,
+            "raw_content": block_str.strip(),
+            "type": content_type,
+            "beautified_content": beautified_content,
+        }
+        parsed_blocks.append(block_data)
+        
+    return parsed_blocks
 
